@@ -12,3 +12,8 @@ Die darin erforderlichen Konfigurationsanpassungen sind ausführlich in den Komm
 ## Anwendung
 Der Bot muss mit dem Befehl `/checkinvites` angesprochen werden. Als erster und einziger Parameter folgt der Username.  
 Beispiel: `/checkinvites pr0gramm`
+
+## Screenshot
+Hier mit dem User [Nezos](https://pr0gramm.com/user/Nezos).  
+
+![Abfrage](https://raw.githubusercontent.com/pr0-dev/telegram-invitebenis-bot/master/screenshots/invitebenis.png)
