@@ -78,8 +78,8 @@ if(substr($response['message']['text'], 0, 13 ) === "/checkinvites") {
    * - Der User muss mindestens 0 Benis haben, damit der Inviteverteiler prüft, ob der User durch seine nicht-NSFW Inhalte 3000 Benis erreicht hat.
    * - Der User muss zum Stichtag 180 Tage registriert sein.
    */
-  if(($response['uploadCount'] < 10 AND $response['commentCount'] < 50) OR ($response['user']['score'] < 0 OR ($keydate-$response['user']['registered']) < 15552000)) {
-    SendMessageToTelegram("Crawle [".$username."](https://pr0gramm.com/user/".$username.") obwohl folgende Bedingungen noch nicht erfüllt sind, damit der Inviteverteiler den Nutzer überhaupt prüft:\n".(($response['uploadCount'] > 10 OR $response['commentCount'] > 50) ? TICK : CROSS)." mindestens 10 Uploads (".$response['uploadCount'].") oder 50 Kommentare (".$response['commentCount']."), \n".(($response['user']['score'] > 1000) ? TICK : CROSS)." mindestens 1000 Benis Profilsumme und\n".(($keydate-$response['user']['registered']) < 15552000 ? CROSS : TICK)." mindestens 180 Tage Mitgliedschaft.", $chat_id);
+  if(($response['uploadCount'] < 10 AND $response['commentCount'] < 50) OR ($keydate-$response['user']['registered']) < 15552000) {
+    SendMessageToTelegram("Crawle [".$username."](https://pr0gramm.com/user/".$username.") obwohl folgende Bedingungen noch nicht erfüllt sind, damit der Inviteverteiler den Nutzer überhaupt prüft:\n".(($response['uploadCount'] > 10 OR $response['commentCount'] > 50) ? TICK : CROSS)." mindestens 10 Uploads (".$response['uploadCount'].") oder 50 Kommentare (".$response['commentCount'].") und\n".(($keydate-$response['user']['registered']) < 15552000 ? CROSS : TICK)." mindestens 180 Tage Mitgliedschaft.", $chat_id);
     $inviteberechtigt = "NICHT inviteberechtigt ".CROSS;
   } else {
     SendMessageToTelegram("Crawle [".$username."](https://pr0gramm.com/user/".$username.")...", $chat_id);
