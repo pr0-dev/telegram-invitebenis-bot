@@ -24,12 +24,14 @@ require_once(__DIR__.DIRECTORY_SEPARATOR."functions.php");
 date_default_timezone_set("Europe/Berlin");
 
 /**
- * Letzten Stichtag herausfinden
+ * Stichtage herausfinden
  * Hinweis: Invitevergabe immer Anfang Februar, Mai, August und November.
  * Gerechnet wird mit dem 01. des jeweiligen Monats um 00:00:00
  */
-$keymonth = array(1 => 11, 2 => 2, 3 => 2, 4 => 2, 5 => 5, 6 => 5, 7 => 5, 8 => 8, 9 => 8, 10 => 8, 11 => 11, 12 => 11);
-$keydate = mktime(0, 0, 0, $keymonth[date("n")], 1, (date("n") < 2 ? date("Y")-1 : date("Y")));
+$last_keymonth = array(1 => 11, 2 => 2, 3 => 2, 4 => 2, 5 => 5, 6 => 5, 7 => 5, 8 => 8, 9 => 8, 10 => 8, 11 => 11, 12 => 11);
+$last_keydate = mktime(0, 0, 0, $last_keymonth[date("n")], 1, (date("n") < 2 ? date("Y")-1 : date("Y")));
+$next_keymonth = array(1 => 2, 2 => 5, 3 => 5, 4 => 5, 5 => 8, 6 => 8, 7 => 8, 8 => 11, 9 => 11, 10 => 11, 11 => 2, 12 => 2);
+$next_keydate = mktime(0, 0, 0, $next_keymonth[date("n")], 1, (date("n") > 10 ? date("Y")+1 : date("Y")));
 
 /**
  * Input von Telegram auffangen.
@@ -60,7 +62,7 @@ if($response['message']['chat']['id'] != $chat_id) {
 if(substr($response['message']['text'], 0, 13 ) === "/checkinvites") {
   $username = explode(" ", $response['message']['text']);
   if(!($username = validUsername($username[1]))) {
-    SendMessageToTelegram("Kein oder fehlerhafter Username übergeben.\nErlaubt sind `[a-zA-Z0-9-_]{2,32}`\nzum Beispiel `/checkinvites pr0gramm`", $chat_id);
+    SendMessageToTelegram("Kein oder fehlerhafter Username übergeben.\nErlaubt sind `[a-zA-Z0-9-_]{2,32}`\nzum Beispiel `/checkinvites pr0gramm`", $chat_id, TRUE);
     die();
   }
   $response = apiCall("https://pr0gramm.com/api/profile/info/?name=".$username);
@@ -69,7 +71,7 @@ if(substr($response['message']['text'], 0, 13 ) === "/checkinvites") {
    * Pro Upload-Anfrage 120 Uploads und pro Kommentar-Anfrage 50 Kommentare, daher die Limits.
    */
   if($response['uploadCount'] > 2500 OR $response['commentCount'] > 2000) {
-    SendMessageToTelegram("Crawle [".$username."](https://pr0gramm.com/user/".$username.") NICHT, da der User mehr als 2.500 Uploads und/oder mehr als 2.000 Kommentare hat.", $chat_id);
+    SendMessageToTelegram("Crawle [".$username."](https://pr0gramm.com/user/".$username.") NICHT, da der User mehr als 2.500 Uploads und/oder mehr als 2.000 Kommentare hat.", $chat_id, TRUE);
     die();
   }
   /**
@@ -78,11 +80,18 @@ if(substr($response['message']['text'], 0, 13 ) === "/checkinvites") {
    * - Der User muss mindestens 0 Benis haben, damit der Inviteverteiler prüft, ob der User durch seine nicht-NSFW Inhalte 3000 Benis erreicht hat.
    * - Der User muss zum Stichtag 180 Tage registriert sein.
    */
-  if(($response['uploadCount'] < 10 AND $response['commentCount'] < 50) OR ($keydate-$response['user']['registered']) < 15552000) {
-    SendMessageToTelegram("Crawle [".$username."](https://pr0gramm.com/user/".$username.") obwohl folgende Bedingungen noch nicht erfüllt sind, damit der Inviteverteiler den Nutzer überhaupt prüft:\n".(($response['uploadCount'] > 10 OR $response['commentCount'] > 50) ? TICK : CROSS)." mindestens 10 Uploads (".$response['uploadCount'].") oder 50 Kommentare (".$response['commentCount'].") und\n".(($keydate-$response['user']['registered']) < 15552000 ? CROSS : TICK)." mindestens 180 Tage Mitgliedschaft.", $chat_id);
+  if(($response['uploadCount'] < 10 AND $response['commentCount'] < 50) OR ($last_keydate-$response['user']['registered']) < 15552000) {
+    $lastdays = floor(($last_keydate-$response['user']['registered']) / 86400);
+    $nextdays = floor(($next_keydate-$response['user']['registered']) / 86400);
+    SendMessageToTelegram("Crawle [".$username."](https://pr0gramm.com/user/".$username.") obwohl folgende Bedingungen noch nicht erfüllt sind, damit der Inviteverteiler den Nutzer überhaupt prüft:\n".
+    (($response['uploadCount'] > 10 OR $response['commentCount'] > 50) ? TICK : CROSS)." mindestens 10 Uploads (".$response['uploadCount'].") oder 50 Kommentare (".$response['commentCount'].") und\n".
+    "mindestens 180 Tage Mitgliedschaft:\n".
+    ($lastdays >= 180 ? TICK : CROSS)." am letzten Stichtag ".date("d.m.Y", $last_keydate).": ".$lastdays." Tage\n".
+    ($nextdays >= 180 ? TICK : CROSS)." am nächsten Stichtag ".date("d.m.Y", $next_keydate).": ".$nextdays." Tage",
+    $chat_id, TRUE);
     $inviteberechtigt = "NICHT inviteberechtigt ".CROSS;
   } else {
-    SendMessageToTelegram("Crawle [".$username."](https://pr0gramm.com/user/".$username.")...", $chat_id);
+    SendMessageToTelegram("Crawle [".$username."](https://pr0gramm.com/user/".$username.")...", $chat_id, TRUE);
   }
   /**
    * Voraussetzungen wurden erfüllt, jetzt wird der nicht-NSFW Benis von bestehendem Usercontent gezählt.
@@ -107,7 +116,7 @@ if(substr($response['message']['text'], 0, 13 ) === "/checkinvites") {
         if($itemcontent['id'] < $older) {
           $older = $itemcontent['id'];
         }
-        if($itemcontent['created'] <= $keydate) {
+        if($itemcontent['created'] <= $last_keydate) {
           $totalbenis_keydate = $totalbenis_keydate+$itemcontent['up']-$itemcontent['down'];
         }
       }
@@ -130,7 +139,7 @@ if(substr($response['message']['text'], 0, 13 ) === "/checkinvites") {
       if($itemcontent['created'] < $before) {
         $before = $itemcontent['created'];
       }
-      if($itemcontent['created'] <= $keydate) {
+      if($itemcontent['created'] <= $last_keydate) {
         $totalbenis_keydate = $totalbenis_keydate+$itemcontent['up']-$itemcontent['down'];
       }
     }
@@ -141,9 +150,9 @@ if(substr($response['message']['text'], 0, 13 ) === "/checkinvites") {
     } else {
       $inviteberechtigt = "NICHT inviteberechtigt ".CROSS;
     }
-    SendMessageToTelegram("Der User [".$username."](https://pr0gramm.com/user/".$username.") ist *".$inviteberechtigt."*\nGesamtbenis sfw/nsfl/nsfp: ".$totalbenis.(($totalbenis < 3000) ? " (Fehlend: ".(3000-$totalbenis).")" : "")."\nGesamtbenis zum Stichtag: ".$totalbenis_keydate, $chat_id);
+    SendMessageToTelegram("Der User [".$username."](https://pr0gramm.com/user/".$username.") ist *".$inviteberechtigt."*\nGesamtbenis sfw/nsfl/nsfp: ".$totalbenis.(($totalbenis < 3000) ? " (Fehlend: ".(3000-$totalbenis).")" : "")."\nGesamtbenis zum Stichtag: ".$totalbenis_keydate, $chat_id, TRUE);
   } else {
-    SendMessageToTelegram("Gesamtbenis sfw/nsfl/nsfp: ".$totalbenis.(($totalbenis < 3000) ? " (Fehlend: ".(3000-$totalbenis).")" : "\n_(ausreichend, aber der User wird aus o.g. Gründen nicht berücksichtigt)_"), $chat_id);
+    SendMessageToTelegram("Gesamtbenis sfw/nsfl/nsfp: ".$totalbenis.(($totalbenis < 3000) ? " (Fehlend: ".(3000-$totalbenis).")" : "\n_(ausreichend, aber der User wird aus o.g. Gründen nicht berücksichtigt)_"), $chat_id, TRUE);
   }
 }
 ?>
