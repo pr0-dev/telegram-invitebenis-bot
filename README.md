@@ -14,6 +14,10 @@ Der Bot muss mit dem Befehl `/checkinvites` angesprochen werden. Als erster und 
 Beispiel: `/checkinvites pr0gramm`
 
 ## Screenshot
-Hier mit dem User [Nezos](https://pr0gramm.com/user/Nezos).  
+Positivbeispiel mit dem User [Nezos](https://pr0gramm.com/user/Nezos).  
 
-![Abfrage](https://raw.githubusercontent.com/pr0-dev/telegram-invitebenis-bot/master/screenshots/invitebenis.png)
+![positive Abfrage](https://raw.githubusercontent.com/pr0-dev/telegram-invitebenis-bot/master/screenshots/positive.png)  
+
+Negativbeispiel mit dem User [NightNemesis](https://pr0gramm.com/user/NightNemesis)  
+
+![negative Abfrage](https://raw.githubusercontent.com/pr0-dev/telegram-invitebenis-bot/master/screenshots/negative.png)  
