@@ -4,7 +4,6 @@
  * 
  * @author    RundesBalli <rundesballi@rundesballi.com>
  * @copyright 2019 RundesBalli / https://github.com/pr0-dev
- * @version   2.0
  * @license   MIT-License
  */
 
