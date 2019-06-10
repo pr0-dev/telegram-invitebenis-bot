@@ -152,7 +152,7 @@ if(substr($response['message']['text'], 0, 13 ) === "/checkinvites") {
     }
     SendMessageToTelegram("Der User [".$username."](https://pr0gramm.com/user/".$username.") ist *".$inviteberechtigt."*\nGesamtbenis sfw/nsfl/nsfp: ".$totalbenis.(($totalbenis < 3000) ? " (Fehlend: ".(3000-$totalbenis).")" : "")."\nGesamtbenis zum Stichtag: ".$totalbenis_keydate, $chat_id, TRUE);
   } else {
-    SendMessageToTelegram("Gesamtbenis sfw/nsfl/nsfp: ".$totalbenis.(($totalbenis < 3000) ? " (Fehlend: ".(3000-$totalbenis).")" : "\n_(ausreichend, aber der User wird aus o.g. Gründen nicht berücksichtigt)_"), $chat_id, TRUE);
+    SendMessageToTelegram("Gesamtbenis sfw/nsfl/nsfp: ".$totalbenis.(($totalbenis < 3000) ? " (Fehlend: ".(3000-$totalbenis).")" : "\n_(ausreichend, aber der User wurde aus o.g. Gründen nicht berücksichtigt)_"), $chat_id, TRUE);
   }
 }
 ?>
