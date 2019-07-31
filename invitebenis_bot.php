@@ -67,6 +67,13 @@ if(substr($response['message']['text'], 0, 13 ) === "/checkinvites") {
   }
   $response = apiCall("https://pr0gramm.com/api/profile/info/?name=".$username);
   /**
+   * Prüfung ob es den User überhaupt gibt.
+   */
+  if(isset($response['error']) AND $response['error'] == "notFound") {
+    SendMessageToTelegram(CROSS." Der User `".$username."` existiert nicht.", $chat_id, TRUE);
+    die();
+  }
+  /**
    * Prüfung ob der User zu viel Inhalte hat, damit der Bot nicht ewig läuft.
    * Pro Upload-Anfrage 120 Uploads und pro Kommentar-Anfrage 50 Kommentare, daher die Limits.
    */
