@@ -74,14 +74,6 @@ if(substr($response['message']['text'], 0, 13 ) === "/checkinvites") {
     die();
   }
   /**
-   * Prüfung ob der User zu viel Inhalte hat, damit der Bot nicht ewig läuft.
-   * Pro Upload-Anfrage 120 Uploads und pro Kommentar-Anfrage 50 Kommentare, daher die Limits.
-   */
-  if($response['uploadCount'] > 2500 OR $response['commentCount'] > 2000) {
-    SendMessageToTelegram("Crawle [".$username."](https://pr0gramm.com/user/".$username.") NICHT, da der User mehr als 2.500 Uploads und/oder mehr als 2.000 Kommentare hat.", $chat_id, TRUE);
-    die();
-  }
-  /**
    * Prüfung ob die Mindestanforderungen erfüllt wurden, damit der Inviteverteiler den Nutzer überhaupt in Betracht zieht.
    * - Es müssen mindestens 10 Uploads ODER 50 Kommentare vorhanden sein.
    * - Der User muss mindestens 0 Benis haben, damit der Inviteverteiler prüft, ob der User durch seine nicht-NSFW Inhalte 3000 Benis erreicht hat.
