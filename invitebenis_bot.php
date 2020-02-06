@@ -4,7 +4,7 @@
  * 
  * @author    RundesBalli <rundesballi@rundesballi.com>
  * @copyright 2019 RundesBalli / https://github.com/pr0-dev
- * @version   2.1
+ * @version   2.2
  * @license   MIT-License
  */
 
@@ -73,6 +73,16 @@ if(substr($response['message']['text'], 0, 13 ) === "/checkinvites") {
     SendMessageToTelegram(CROSS." Der User `".$username."` existiert nicht.", $chat_id, TRUE);
     die();
   }
+  
+  /**
+   * Prüfung ob die Anfrage zu viele API-Requests auslösen würde.
+   */
+  $callCount = ceil($response['commentCount']/50)+ceil($response['uploadCount']/120);
+  if($callCount > 50) {
+    SendMessageToTelegram(CROSS." Der User [".$username."](https://pr0gramm.com/user/".$username.") würde mehr als 50 API-Anfragen auslösen und wird daher nicht gecrawlt.", $chat_id, TRUE);
+    die();
+  }
+
   /**
    * Prüfung ob die Mindestanforderungen erfüllt wurden, damit der Inviteverteiler den Nutzer überhaupt in Betracht zieht.
    * - Es müssen mindestens 10 Uploads ODER 50 Kommentare vorhanden sein.
